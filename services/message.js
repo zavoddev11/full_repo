@@ -1,9 +1,16 @@
 const Message = require("./../models/message");
 
-async function createMessage(messageData) {
-  let websiteName = await chatWithGPT(messageData.sitedata, "What is the site name?")
+// async function createMessage(messageData) {
+//   return await Message.create(messageData);
+// }
 
-  await Message.create({ ...messageData, websiteName });
+async function createMessage(messageData) {
+
+  // const sitename_quwery = await queru()
+
+  // let websiteName = await chatWithGPT(messageData.sitedata, "What is the site name?")
+
+  await Message.create({ ...messageData });
 }
 
 async function getMessagesBySession(sessionId) {

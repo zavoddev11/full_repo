@@ -13,7 +13,7 @@ async function chatWithGPT(session_id, prompt) {
         });
 
         let full_response = {
-            admin_type: "bot",
+            sender_type: "bot",
             session_id,
             message: response.choices[0].message.content.trim()
         }

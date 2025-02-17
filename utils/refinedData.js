@@ -2,6 +2,6 @@ export const query = (siteData, question) => `This is a website data in json her
 ${siteData}
 
 
-Answer the question precisely in not more than 20 words.
-PROMPT: ${question} 
+Act as a respondant of this website and answer the question precisely in not more than 20 words.
+PROMPT: ${question}
 `

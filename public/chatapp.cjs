@@ -1,5 +1,4 @@
-
-let API_URL = "http://localhost:8000"
+let API_URL = "http://localhost:8000";
 
 function nanoid(t = 21) {
   return crypto.getRandomValues(new Uint8Array(t)).reduce((t, e) =>
@@ -17,14 +16,12 @@ async function createSession(sitedata) {
     refinedSiteData: "text"
   };
 
-  console.log({ chatdata: data })
+  console.log({ chatdata: data });
 
   try {
     const response = await fetch(`${API_URL}/api/sessions`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
@@ -36,107 +33,45 @@ async function createSession(sitedata) {
     console.log("Success:", result._id);
     return result._id;
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Connection error!", error);
+    // alert("Failed to connect to server. Please check your internet connection.");
   }
 }
 
-async function truncateArrayTo500(arr) {
-  let joinedString = arr.join("_n_"); // Join with _n_
-  if (joinedString.length <= 500) return joinedString.split("_n_"); // Return as an array if within limit
-  console.log({ len: joinedString.length })
-
-  let truncatedString = joinedString.slice(0, 500); // Cut at 500 characters
-
-  let lastSeparator = truncatedString.lastIndexOf("_n_");
-  if (lastSeparator > 0) {
-    truncatedString = truncatedString.slice(0, lastSeparator); // Trim to last full section
-  }
-  return truncatedString.split("_n_");
-}
-
-async function extractSitemap(url) {
+async function extractData() {
   try {
-    let response = await fetch(url);
+    let response = await fetch(window.location.origin + "/sitemap.xml");
     if (!response.ok) throw new Error("Failed to fetch sitemap");
-
-    let text = await response.text();
-    text = text.trim().replace(/^.*?</s, "<");
-
-    const xmlDoc = new window.DOMParser().parseFromString(text, "application/xml");
-    console.log({ xmlDoc })
-    console.log("Raw Response:", text);
-
-    const parseError = xmlDoc.querySelector("parsererror");
-    if (parseError) {
-      console.error("XML Parsing Error:", parseError.textContent);
-      return [];
-    }
-
-    const urls = [...xmlDoc.getElementsByTagName("loc")].map(loc => loc.textContent);
-    let someurl = await truncateArrayTo500(urls);
-    console.log("Extracted URLs:", someurl);
-    return someurl
-
+    return await response.text();
   } catch (error) {
     console.error("Error fetching sitemap:", error);
+    // alert("Could not retrieve site data. Please check your connection.");
     return [];
   }
 }
 
-async function extractPageInfo() {
-  let limit = 1000
-  const truncate = (text, max) => text.length > max ? text.slice(0, max - 3) + "..." : text;
-  const pageInfo = {
-    title: truncate(document.title, 100),
-    // metaDescription: truncate(document.querySelector('meta[name="description"]')?.content || "No description", 150),
-    headings: [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')].map(h => truncate(h.innerText, 100)),
-    links: [...document.querySelectorAll('a')].map(a => ({
-      text: truncate(a.innerText, 50),
-      href: truncate(a.href, 100)
-    })),
-    paragraphs: [...document.querySelectorAll('p')].map(p => truncate(p.innerText, 200)),
-    images: [...document.querySelectorAll('img')].map(img => ({
-      src: truncate(img.src, 100),
-      alt: truncate(img.alt || "No alt text", 50)
-    }))
-  };
-
-  let jsonString = JSON.stringify(pageInfo);
-
-  if (jsonString.length > limit) {
-    jsonString = truncate(jsonString, limit);
-  }
-  return pageInfo;
-}
-
-async function extractData() {
-  console.log("here")
-  let sitemapData = await extractSitemap(window.location.origin + "/sitemap.xml");
-  let pageInfo = await extractPageInfo(window.location.origin + "/index.html");
-  return ({
-    sitemapData,
-    pageInfo
-  })
-}
-
-
 async function getSessionId() {
   try {
-    let storedSessionId = localStorage.getItem("session_id");
-    let extractedData = await extractData()
-    if (!storedSessionId) {
-
-      storedSessionId = await createSession(extractedData)
-
-      localStorage.setItem("session_id", storedSessionId);
+    let storedSessionId = localStorage.getItem("chat__session__id");
+    let extractedData = await extractData();
+    if (!storedSessionId || storedSessionId === "undefined") {
+      storedSessionId = await createSession(extractedData);
+      localStorage.setItem("chat__session__id", storedSessionId);
     }
-    console.log({ storedSessionId: storedSessionId.toLocaleLowerCase() })
     return storedSessionId;
-
   } catch (error) {
-    console.log({ error })
+    console.error("Session error:", error);
+    // alert("Could not establish a session. Please try again.");
   }
 }
+
+globalThis.socket = io(API_URL, {
+  reconnectionAttempts: 3, // Limit reconnection attempts
+  timeout: 5000, // Connection timeout
+});
+
+
+
 
 getSessionId();
 
@@ -146,9 +81,75 @@ function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
+  const [Loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const socketRef = useRef(null);
+  const [isConnected, setIsConnected] = useState(false);
 
 
+  const fetchCalled = useRef(false);
+
+  globalThis.socket = io(API_URL, {
+    reconnectionAttempts: 5, // Increase reconnection attempts
+    reconnectionDelayMax: 5000, // Max delay before retrying
+    timeout: 5000, // Timeout for the connection
+  });
+
+
+
+  useEffect(() => {
+    socketRef.current = io(API_URL, {
+      reconnectionAttempts: 5,
+      timeout: 5000,
+    });
+
+    const socket = socketRef.current;
+
+    // Handle successful connection
+    socket.on("connect", () => {
+      console.log("Connected to socket server.");
+      setIsConnected(true);
+    });
+
+    // Handle connection errors
+    socket.on("connect_error", (error) => {
+      console.error("WebSocket connection failed:", error.message);
+      setIsConnected(false);
+      // alert("Chat connection lost. Please check your internet connection.");
+    });
+
+    // Handle disconnection
+    socket.on("disconnect", (reason) => {
+      console.warn("Socket disconnected:", reason);
+      setIsConnected(false);
+      if (reason === "io server disconnect") {
+        socket.connect(); // Try reconnecting if the server disconnected the socket
+      }
+    });
+
+    // Fetch messages on first load
+    async function fetchMessageBySessionID(id) {
+      try {
+        console.log({ id });
+        let response = await fetch(`${API_URL}/api/messages/session/${id}`);
+        let data = await response.json();
+        if (data && data.length > 0) setMessages(data);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    }
+
+    let session_id = localStorage.getItem("chat__session__id");
+    if (session_id) fetchMessageBySessionID(session_id);
+
+    
+
+    fetchCalled.current = true;
+
+    // return () => {
+    //   socket.disconnect();
+    // };
+  }, []);
 
   useEffect(() => {
     socket.on("message:receive", (message) => {
@@ -161,15 +162,20 @@ function ChatWidget() {
     };
   }, []);
 
+
   function toggleChat() {
     setIsOpen(!isOpen);
   }
 
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
+  // useEffect(() => {
+  //   let session_id = localStorage.getItem("chat__session__id")
+  //   if (session_id) {
+  //     fetchMessageBySessionID(session_id)
+  //   }
+  //   // if (messagesEndRef.current) {
+  //   //   messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  //   // }
+  // }, [messages]);
 
   function handleInputChange(event) {
     setMessage(event.target.value);
@@ -177,7 +183,7 @@ function ChatWidget() {
 
   const sendMessage = () => {
     if (!message.trim()) return;
-    const userMessage = { sender_type: "customer", message, session_id: localStorage.getItem("session_id") };
+    const userMessage = { sender_type: "customer", message, session_id: localStorage.getItem("chat__session__id") };
 
     setMessages((prev) => [...prev, userMessage]);
     setMessage('');
@@ -200,6 +206,11 @@ function ChatWidget() {
             Chat Support
             <button onClick={toggleChat} style={{ background: 'white', color: '#007bff', border: 'none', cursor: 'pointer' }}>X</button>
           </div>
+
+          <div className={`connection_status ${!isConnected ? " inactive_connection" : ""} `} >
+            {!isConnected && "No internet connection..."}
+          </div>
+
           <div className="chat-body">
             {messages.map((msg, index) => (
               <div key={index} className={`message-container ${msg.sender_type === 'customer' ? 'sent' : 'received'}`}>

@@ -3,9 +3,9 @@ const { getMessagesBySession, createMessage } = require("../services/message");
 
 module.exports.getSessionMessages = async (req, res, next) => {
     try {
-        let sessionID = await req.params.sessionID
-        console.log({ sessionID })
-        const messages = await getMessagesBySession(sessionID)
+        let id = await req.params.id
+        console.log({ id })
+        const messages = await getMessagesBySession(id)
 
         return res.status(200).json(messages);
     } catch (error) {
