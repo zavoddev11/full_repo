@@ -1,4 +1,7 @@
-let API_URL = `https://ai.zavod-it.com`;
+let API_URL = `https://ai.zavod-it.com:443`;
+let SOCKET_URL = `https://ai.zavod-it.com:443`;
+// let API_URL = `https://ai-chatbot-zvln.onrender.com`;
+// let API_URL = `https://20.120.216.138`;
 // let API_URL = `http://localhost:5459`;
 
 // globalThis.socket = io(API_URL, {
@@ -134,7 +137,7 @@ function ChatWidget() {
       socketRef.current = null;  // Clear the reference
     }
 
-    socketRef.current = io.connect(API_URL, {
+    socketRef.current = io.connect(SOCKET_URL, {
       transports: ['websocket', 'polling'], // Define transports to avoid "undefined" transport warning
     });
 

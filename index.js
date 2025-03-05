@@ -36,7 +36,11 @@ const DialogueComponent = componentLoader.add('dialogue', path.resolve(__dirname
 const app = express();
 
 // const allowedOrigins = ["https://ai-chatbot-zvln.onrender.com", 'http://localhost:5459', process.env.LINK_CORS];
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 
 app.use(express.static(path.join(__dirname, "public")));
