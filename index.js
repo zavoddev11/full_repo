@@ -58,7 +58,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/messages", messageRoutes);
 
 
-const PORT = process.env.PORT
+const PORT = 5459
 const connection = mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => {

@@ -48,9 +48,7 @@ function ChatWidget() {
 
       console.log({ website_id })
 
-      io.configure(function () {
-        io.set('close timeout', 60 * 60 * 24); // 24h time out
-      });
+      io.set('close timeout', 60 * 60 * 24); // 24h time out
 
       if (website_id) {
         const response = await fetch(`${API_URL}/api/sessions`, {
