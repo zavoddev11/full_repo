@@ -48,7 +48,6 @@ function ChatWidget() {
 
       console.log({ website_id })
 
-      io.set('close timeout', 60 * 60 * 24); // 24h time out
 
       if (website_id) {
         const response = await fetch(`${API_URL}/api/sessions`, {
@@ -157,7 +156,7 @@ function ChatWidget() {
       // setLoading("Connection failed. Retrying...");  // Inform the user about connection issues
       // Optionally retry after a delay or provide an alert
       setTimeout(() => {
-        socket.connect();  // Retry the connection manually after a delay
+        socketRef.current.connect();  // Retry the connection manually after a delay
       }, 3000);
     });
 

@@ -11,7 +11,7 @@ function setupSocket(server) {
     transports: ['websocket', 'polling'],
     'flash policy': false,  // For older versions, you might need this for cross-domain support
     cors: {
-      origin: "*",  // Allow all origins (you can specify a specific origin if needed)
+      'origins': '*:*',  // Allow all origins (you can specify a specific origin if needed)
       methods: ["GET", "POST"],  // Allow GET and POST requests
       credentials: true  // Allow credentials (cookies, authorization headers, etc.)
     }
