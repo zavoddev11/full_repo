@@ -1,8 +1,11 @@
 
-const router = require("express").Router();
-const { getSessionMessages, createMessage } = require("./../controllers/message")
+import { Router } from "express";
+const router = Router()
 
-router.post("/", createMessage);
+import { getSessionMessages, createAMessage, getAllTheMessages } from "./../controllers/message.js"
+
+router.get("/", getAllTheMessages);
+router.post("/", createAMessage);
 router.get("/session/:id", getSessionMessages);
 
-module.exports = router;
+export default router;

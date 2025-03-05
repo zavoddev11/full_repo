@@ -1,8 +1,12 @@
-const router = require("express").Router();
-const { getSessionById, createSession, getSessions } = require("./../controllers/session")
+import { Router } from "express"
+import { getSessionById, createSession, getSessions } from "./../controllers/session.js"
+// const { generatePageDetails } = require("./../controllers/data")
+const router = Router()
 
-router.post("/", createSession);
+// createStorage()
+// router.post("/data", generatePageDetails);
 router.get("/", getSessions);
+router.post("/", createSession);
 router.get("/:id", getSessionById);
 
-module.exports = router;
+export default router;

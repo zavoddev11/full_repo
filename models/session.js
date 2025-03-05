@@ -1,16 +1,13 @@
-const mongoose = require("mongoose");
-const { Schema } = mongoose;
+import mongoose from "mongoose"
 
-const SessionSchema = new Schema({
-    websiteName: String,
-    sitedata: { type: Array },
-    website: String,
-    refinedSiteData: String,
-    owner: String,
+const SessionSchema = new mongoose.Schema({
+    website_id: String,
     status: { type: String, enum: ["active", "closed"], default: "active" },
 }, { timestamps: true });
 
-module.exports = mongoose.model("Session", SessionSchema);
+
+const Session = mongoose.model.Session || mongoose.model("Session", SessionSchema)
+export default Session
 
 
 

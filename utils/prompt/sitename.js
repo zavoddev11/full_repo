@@ -1,4 +1,4 @@
-module.exports.sitename_query = (siteData, question) => (`This is a website data in json here
+export const sitename_query = (siteData, question) => (`This is a website data in json here
 ${siteData}
 
 

@@ -1,20 +1,20 @@
-const { chatWithGPT } = require("../utils/ai_bot");
-const { company_detail_prompt } = require("../utils/prompt/summary");
-const Session = require("./../models/session");
-const { sitename_query } = require("../utils/prompt/sitename")
+import { chatWithGPT } from "../utils/ai_bot.js"
+import { data } from "./../data/data.js" 
+import { company_detail_prompt } from "../utils/prompt/summary.js"
+import Session from "./../models/session.js"
+import { sitename_query } from "./../utils/prompt/sitename.js"
 
-async function createSession(sessionData) {
+export const createSession = async function (sessionData) {
 
   const use_sitename_query = sitename_query(JSON.stringify(sessionData.sitedata), "What is the name of this website?")
-  const company_detail = company_detail_prompt(JSON.stringify(sessionData.sitedata))
 
   console.log({ use_sitename_query })
 
-  let websiteName = (await chatWithGPT(sessionData.sitedata, use_sitename_query)).message
-  let company_details = (await chatWithGPT(sessionData.sitedata, company_detail)).message
+  let websiteName = "web site"
+  let company_details = "web site"
 
   let fullData = {
-    ...sessionData, websiteName, refinedSiteData: company_details,
+    ...sessionData, sitedata: data, websiteName, refinedSiteData: company_details,
   }
 
   console.log({ websiteName })
@@ -22,15 +22,15 @@ async function createSession(sessionData) {
   return await Session.create(fullData);
 }
 
-async function getSessionById(sessionId) {
+export const getSessionById = async function (sessionId) {
   return await Session.findById(sessionId)
 }
 
-async function getAllSessions() {
+export const getAllSessions = async function () {
   return await Session.find()
 }
 
-async function closeSession(sessionId) {
+export const closeSession = async function (sessionId) {
   return await Session.findByIdAndUpdate(
     sessionId,
     { status: "closed", endedAt: new Date() },
@@ -38,9 +38,11 @@ async function closeSession(sessionId) {
   );
 }
 
-module.exports = {
+
+const all = {
   createSession,
   getSessionById,
-  closeSession,
   getAllSessions
-};
+}
+
+export default all

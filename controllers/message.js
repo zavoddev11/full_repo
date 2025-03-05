@@ -1,7 +1,18 @@
-const { getMessagesBySession, createMessage } = require("../services/message");
+import { getMessagesBySession, createMessage, getAllMessages } from "./../services/message.js";
 
+export const getAllTheMessages = async (req, res, next) => {
+    try {
+        let id = await req.params.id
+        console.log({ id })
+        const messages = await getAllMessages()
 
-module.exports.getSessionMessages = async (req, res, next) => {
+        return res.status(200).json(messages);
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ msg: "Failed to Fetch Messages to the database" });
+    }
+}
+export const getSessionMessages = async (req, res, next) => {
     try {
         let id = await req.params.id
         console.log({ id })
@@ -13,7 +24,9 @@ module.exports.getSessionMessages = async (req, res, next) => {
     }
 }
 
-module.exports.createMessage = async (req, res, next) => {
+
+
+export const createAMessage = async (req, res, next) => {
     try {
         let messageData = req.body
         const message = await createMessage(messageData)
@@ -23,3 +36,5 @@ module.exports.createMessage = async (req, res, next) => {
         return res.status(500).json({ msg: "Failed to Fetch Messages to the database" });
     }
 }
+
+

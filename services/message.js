@@ -1,23 +1,29 @@
-const Message = require("./../models/message");
+import Message from "./../models/message.js";
+import Session from "./../models/session.js";
 
-// async function createMessage(messageData) {
-//   return await Message.create(messageData);
-// }
+export const createMessage = async function createMessage(data) {
+  try {
+    console.log({ data })
 
-async function createMessage(messageData) {
+    let message = await Message.create({
+      session_id: data.session_id,
+      website_id: data.website_id,
+      message: data.message,
+      timeTaken: data.timeTaken,
+      sender_type: data.sender_type,
+      reply_to: data.reply_to
+    })
 
-  // const sitename_quwery = await queru()
-
-  // let websiteName = await chatWithGPT(messageData.sitedata, "What is the site name?")
-
-  await Message.create({ ...messageData });
+    return message
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-async function getMessagesBySession(sessionId) {
+export const getMessagesBySession = async function getMessagesBySession(sessionId) {
   return await Message.find({ session_id: sessionId }).sort({ createdAt: 1 });
 }
 
-module.exports = {
-  createMessage,
-  getMessagesBySession,
-};
+export const getAllMessages = async function getMessagesBySession(sessionId) {
+  return await Message.find()
+}

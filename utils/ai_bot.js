@@ -1,15 +1,30 @@
-require("dotenv").config();
-const { OpenAI } = require("openai");
+import { config } from "dotenv"
+import { OpenAI } from "openai"
+import { message_context } from "./message_prompt.js";
+
+config()
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-async function chatWithGPT(session_id, prompt) {
+
+
+export const chatWithGPT = async function (session_id, ai_query, previous_messages, userMessage) {
+
+    let prev_message = await message_context(previous_messages)
+
+    let messages = [
+        { role: "system", content: ai_query },
+        ...prev_message,
+        { role: "user", content: userMessage }
+    ]
+
     try {
+
         let response = await openai.chat.completions.create({
             model: "gpt-4o-mini",
-            messages: [{ role: "user", content: prompt }],
+            messages,
         });
 
         let full_response = {
@@ -17,6 +32,7 @@ async function chatWithGPT(session_id, prompt) {
             session_id,
             message: response.choices[0].message.content.trim()
         }
+
         console.log({ response: full_response })
         return full_response
     } catch (error) {
@@ -24,5 +40,3 @@ async function chatWithGPT(session_id, prompt) {
         throw "Error processing request.";
     }
 }
-
-module.exports = { chatWithGPT };

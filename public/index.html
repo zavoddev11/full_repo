@@ -1,12 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>React in HTML</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Bot App</title>
+  <link rel="stylesheet" href="https://ai.zavod-it.com/chatapp.css">
 </head>
+
 <body>
-    <div id="root"></div>
-    <script src="chatapp.js"></script>
+  <h1>Chat Bot App</h1>
+  <div id="chat-container"></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@0.9.0/dist/socket.io.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+  <script>
+    let widget_info = {
+      "link": "zavod-it.com",
+      "website_id": "67c093e44b6e3ee3a8a1fa84"
+    };
+  </script>
+  <script type="text/babel" src="https://ai.zavod-it.com/chatapp.js"></script>
+  <!-- <script type="text/babel" src="http://localhost:5459/chatapp.js"></script> -->
 </body>
+
 </html>

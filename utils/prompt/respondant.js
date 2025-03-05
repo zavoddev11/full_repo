@@ -1,22 +1,16 @@
-module.exports.respondant_query = (refinedData, siteData, question) => {
+export const respondant_query = (siteData) => {
 
-let data = `
+    let data = `
 
-Here is the company summary: 
-${refinedData}
+    You are a helpful assistant. Please act as a respondant for the company, Based on the following information, answer the user's question:
+    Do not need to formatting to reponse. I want maximum of 110 words
 
-
-Here is the array:
-${siteData}
-
-customer question: ${question}
-
-
-"Act as a customer support AI using the provided company summary.
- Answer questions concisely (max 21 words). If details are missing,
- direct users to the most relevant link from the provided list."
+    Context:
+    ${siteData}
 
 `
-    console.log(data)
+    // console.log(data)
     return data
 }
+
+// Act as a customer support AI using the provided company summary.
