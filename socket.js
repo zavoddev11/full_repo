@@ -6,13 +6,19 @@ let io;
 
 function setupSocket(server) {
   // Initialize socket.io with the server
+
   io = socketio.listen(server, {
     transports: ['websocket', 'polling'],
-    'flash policy': false // For older versions, you might need this for cross-domain support
+    'flash policy': false,  // For older versions, you might need this for cross-domain support
+    cors: {
+      origin: "*",  // Allow all origins (you can specify a specific origin if needed)
+      methods: ["GET", "POST"],  // Allow GET and POST requests
+      credentials: true  // Allow credentials (cookies, authorization headers, etc.)
+    }
   });
 
   // io.configure(function () {
-    io.set('close timeout', 60 * 60 * 24); // 24-hour timeout
+  io.set('close timeout', 60 * 60 * 24); // 24-hour timeout
   // });
 
   // Listen for connections
