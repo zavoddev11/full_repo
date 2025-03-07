@@ -1,6 +1,7 @@
 // Require socket.io
 import socketio from 'socket.io';
 import messageHandlers from './utils/communications.js';
+import { tryEach } from 'async';
 
 let io;
 
@@ -36,11 +37,16 @@ function setupSocket(server) {
   });
 }
 
-function getIo() {
-  if (!io) {
-    throw new Error('Socket.io has not been initialized!');
+async function getIo(websiteData) {
+  try {
+    if (!io) {
+      throw new Error('Socket.io has not been initialized!');
+    }
+    io.sockets.emit('create:website', websiteData);
+  } catch (err) {
+    cosole.log(err)
   }
-  return io;
+
 }
 
 const all = { setupSocket, getIo };

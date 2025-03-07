@@ -545,7 +545,7 @@ Manager.prototype.handleRequest = function (req, res) {
       res.writeHead(200);
       res.end('Welcome to socket.io.');
 
-      this.log.info('unhandled socket.io url');
+      // this.log.info('unhandled socket.io url');
     }
 
     return;

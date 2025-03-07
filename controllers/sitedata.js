@@ -16,12 +16,12 @@ export const getAllTheSiteDatas = async (req, res, next) => {
 
 export const getSiteDatasById = async (req, res, next) => {
     try {
-        console.log({ id })
         let id = await req.params.id
         const sitedatas = await getSitedataByWebsiteId(id)
 
         return res.status(200).json(sitedatas);
     } catch (error) {
+        console.log({ error })
         return res.status(500).json({ msg: "Failed to Fetch SiteData to the database" });
     }
 }

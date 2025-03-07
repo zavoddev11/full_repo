@@ -3,6 +3,12 @@ import fs from 'fs'
 import asyncLib from 'async'
 import Sitedata from '../models/sitedata.js'
 import Website from '../models/website.js';
+import { querySimilarDocuments, saveWebsiteData } from './vector/ai_session.js';
+import { getSitedataByWebsiteId } from '../services/sitedata.js';
+
+async function removeAllTags(html) {
+    return html.replace(/<\/?[^>]+(>|$)/g, ""); // Removes all opening & closing tags
+}
 
 async function getInternalLinks(homepage) {
     const browser = await puppeteer.launch({
@@ -92,6 +98,7 @@ async function scrapeMultipleSites(urls, website_id) {
     console.log(`Total ${batches.length} batches to process...`);
 
     let batchIndex = 0;
+
     await asyncLib.eachSeries(batches, async (batch) => {
         batchIndex++; // Increment manually
         console.log(`\nProcessing batch ${batchIndex}/${batches.length}: ${batch.length} URLs`);
@@ -125,6 +132,7 @@ async function scrapeMultipleSites(urls, website_id) {
         }
         console.log(`Batch ${batchIndex} completed.`);
     });
+
     try {
         await Website.findByIdAndUpdate(website_id, { status: "active" });
         console.log(`Website ${website_id} status updated to active ✅`);
@@ -133,7 +141,13 @@ async function scrapeMultipleSites(urls, website_id) {
         console.error(`Error updating website ${website_id} status:`, error);
     }
 
+    let fetchWebsiteData = await Sitedata.find({ website_id })
     console.log("\n✅ All batches completed!");
+
+    console.log({ results })
+
+    await saveWebsiteData(website_id, JSON.stringify(fetchWebsiteData))
+
     return results;
 }
 
@@ -151,7 +165,7 @@ export const scrapeWebsite = async function (homepage, website_id) {
     console.log(`Found ${internalLinks.length} internal links. Scraping now...`);
     const scrapedData = await scrapeMultipleSites(internalLinks, website_id);
     console.log("Scraping completed!");
-    fs.writeFileSync('data.json', JSON.stringify(scrapedData, null, 2), 'utf-8');
+    // fs.writeFileSync('data.json', JSON.stringify(scrapedData, null, 2), 'utf-8');
     console.log("Data saved to data.json ✅");
     return scrapedData;
 }

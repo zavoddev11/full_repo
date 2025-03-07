@@ -5,7 +5,7 @@
     "@admin-bro/mongoose": "^1.1.0",
     "@adminjs/express": "^6.1.1",
     "@adminjs/mongoose": "^4.1.0",
-    "@pinecone-database/pinecone": "^5.0.0",
+    "@pinecone-database/pinecone": "^5.1.1",
     "admin-bro": "^4.0.1",
     "adminjs": "^7.8.15",
     "async": "^3.2.6",
@@ -24,7 +24,8 @@
     "openai": "^4.85.1",
     "puppeteer": "^24.3.0",
     "socket.io": "^0.9.0",
-    "socket.io-client": "^4.8.1",
+    "socket.io-client": "^0.9.0",
+    "tiktoken": "^1.0.20",
     "tslib": "^2.8.1",
     "xmldom": "^0.6.0"
   },

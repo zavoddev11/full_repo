@@ -1,5 +1,6 @@
-let API_URL = `https://ai.zavod-it.com:443`;
-let SOCKET_URL = `https://ai.zavod-it.com:443`;
+let API_URL = `https://ai.zavod-it.com`;
+let SOCKET_URL = `https://ai.zavod-it.com:` + 443;
+// let SOCKET_URL = `http://localhost:5459`;
 // let API_URL = `https://ai-chatbot-zvln.onrender.com`;
 // let API_URL = `https://20.120.216.138`;
 // let API_URL = `http://localhost:5459`;
@@ -78,7 +79,6 @@ function ChatWidget() {
           console.error("Error fetching messages:", error);
           setLoading("")
         }
-
       }
     } catch (error) {
       console.error("Connection error!", error);
@@ -138,7 +138,7 @@ function ChatWidget() {
     }
 
     socketRef.current = io.connect(SOCKET_URL, {
-      transports: ['websocket', 'polling'], // Define transports to avoid "undefined" transport warning
+      transports: ['websocket'], // Define transports to avoid "undefined" transport warning
     });
 
     // Handle successful connection
@@ -154,7 +154,7 @@ function ChatWidget() {
 
     // Handle connection errors
     socketRef.current.on("connect_error", (error) => {
-      console.error("WebSocket connection failed:", error.message);
+      console.log("WebSocket connection failed:", error, message);
       setIsConnected(false);
       // setLoading("Connection failed. Retrying...");  // Inform the user about connection issues
       // Optionally retry after a delay or provide an alert

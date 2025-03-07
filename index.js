@@ -19,10 +19,9 @@ import AdminJS from "adminjs"
 import AdminJSExpress from "@adminjs/express"
 import { Database, Resource } from "@adminjs/mongoose"
 import Website from "./models/website.js";
-import { io } from "socket.io-client";
+
 import { testAi } from "./utils/prompt/test_run.js";
-const SOCKET_URL = process.env.SOCKET_URL
-export const socketClient = io(SOCKET_URL);
+
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -34,7 +33,6 @@ const componentLoader = new ComponentLoader();
 const DialogueComponent = componentLoader.add('dialogue', path.resolve(__dirname, 'components', 'Dialogue.jsx'));
 
 const app = express();
-
 // const allowedOrigins = ["https://ai-chatbot-zvln.onrender.com", 'http://localhost:5459', process.env.LINK_CORS];
 app.use(cors({
   origin: "*",

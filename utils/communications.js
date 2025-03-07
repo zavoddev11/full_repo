@@ -6,9 +6,10 @@ import { scrapeWebsite } from "./sitedata.js";
 import Sitedata from "./../models/sitedata.js";
 import price_data from "./new_data.js"
 import Message from "../models/message.js";
+import { getWebsiteById } from "../services/website.js";
+
 
 export default (io, socket) => {
-
     socket.on("send:close", async (session_id) => {
         console.log({ session_id })
         socket.emit("send:switch", { session_id: session_id })
@@ -45,7 +46,7 @@ export default (io, socket) => {
                     complete_data
                 );
 
-                let ai_response = await chatWithGPT(session_id, ai_query, previous_messages, userMessage);
+                let ai_response = await chatWithGPT(website_id, session_id, ai_query, previous_messages, userMessage);
 
                 const botMessage = {
                     session_id,
@@ -81,8 +82,10 @@ export default (io, socket) => {
         }
     });
 
-    socket.on("create:website", async (data) => {
-        await scrapeWebsite(data.websiteLink, data._id)
+    socket.on("create:website", async (id) => {
+        console.log("recieved", id)
+        let website = await getWebsiteById(id)
+        await scrapeWebsite(website.websiteLink, website._id)
     });
 
     socket.on("connect", () => {
